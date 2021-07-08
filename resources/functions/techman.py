@@ -17,7 +17,7 @@ class techman:
 class yn:
 
 	#yn.ask => Takes in a prompt, asks for input, and returns True for "yes" and False for "no" based on response (Syntax: yn.ask('Yes or no? '))
-	def ask(prompt, yes_list = ["yes","y"], no_list = ['no', 'y']):
+	def ask(prompt, yes_list = ["yes","y"], no_list = ['no', 'n']):
 		response = input(prompt).lower()
 		if response in yes_list:
 			return True
@@ -58,11 +58,15 @@ class quicksetup:
 		except FileNotFoundError:
 			return False
 
-	def does_config_exist(name):
+	def does_config_exist(name, key_to_check=None):
 		import json
 		try:
 			with open('.{}.config'.format(name), 'r') as file:
-				json.loads(file.read().replace('\'', '\"'))
+				config = json.loads(file.read().replace('\'', '\"'))
+				if key_to_check != None:
+					if config.get(key_to_check) == None:
+						print('[ERROR]: Corrupt config file'.format(key=key_to_check))
+						return False
 				return True
 		except FileNotFoundError:
 			return False
@@ -87,6 +91,14 @@ class quicksetup:
 		else:
 			return None
 
+	def update_config(name, new_values):
+		if quicksetup.does_config_exist(name):
+			config = quicksetup.read_config(name)
+		else:
+			config = {}
+		config.update(new_values)
+		return quicksetup.write_config(name, config)
+
 	def reset_config(name):
 		import os
 		try:
@@ -94,3 +106,21 @@ class quicksetup:
 			return True
 		except FileNotFoundError:
 			return False
+
+
+'''
+#Examples
+if not techman.is_compatible(0.9):
+	print('Incompatible techman library')
+	exit()
+name = 'test'
+
+if not quicksetup.does_config_exist(name):
+	quicksetup.write_config(name, {
+		"name": input('What is your name? '),
+		"age": input('How old are you? '),
+		"colorblind": yn.ask('Are you colorblind? ')
+	})
+print(quicksetup.read_config(name))
+#quicksetup.reset_config(name)
+'''
