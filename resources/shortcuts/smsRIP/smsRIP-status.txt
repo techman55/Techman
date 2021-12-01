@@ -1,1 +1,1 @@
-enabled
+Due to several new under the hood changes, an update is required to continue using smsRIP.
